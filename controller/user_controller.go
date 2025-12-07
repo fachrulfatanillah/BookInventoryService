@@ -69,3 +69,36 @@ func CreateUser(c *gin.Context) {
 		},
 	})
 }
+
+func Login(c *gin.Context) {
+	username := c.PostForm("username")
+	password := c.PostForm("password")
+
+	if username == "" || password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Username and password are required",
+		})
+		return
+	}
+
+	var user model.User
+	if err := database.DB.Where("username = ?", username).First(&user).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid username or password",
+		})
+		return
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid username or password",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Login successful",
+		"username": user.Username,
+	})
+}
