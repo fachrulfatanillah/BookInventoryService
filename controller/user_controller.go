@@ -37,6 +37,14 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
+	var existingUser model.User
+	if err := database.DB.Where("username = ?", username).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "username already exists",
+		})
+		return
+	}
+
 	user := model.User{
 		Username:   username,
 		Password:   string(hashedPassword),

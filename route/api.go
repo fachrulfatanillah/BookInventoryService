@@ -14,4 +14,6 @@ func RegisterRoutes(r *gin.Engine) {
 			"message": "Welcome to Book Inventory Service API",
 		})
 	})
+
+	r.POST("/api/users", controller.CreateUser)
 }
