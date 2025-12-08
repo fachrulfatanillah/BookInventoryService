@@ -1,8 +1,11 @@
 # BookInventoryService API Documentation
 
-BookInventoryService adalah RESTful API untuk mengelola buku, kategori, pengguna dengan autentikasi JWT dan middleware.
+Book-Inventory-Service adalah RESTful API untuk mengelola buku, kategori, pengguna dengan autentikasi JWT dan middleware.
 
 ---
+
+## Authentication
+Semua endpoint categories dan books membutuhkan **JWT token** di header:
 
 ## **1. Users**
 
@@ -38,8 +41,6 @@ BookInventoryService adalah RESTful API untuk mengelola buku, kategori, pengguna
 
 
 ## **2. Categories**
-
----- Semua endpoint Categories membutuhkan autentikasi. ----
 
 ### **2.1 Create Category**
 - **Endpoint:** POST `POST /categories`
@@ -157,8 +158,6 @@ BookInventoryService adalah RESTful API untuk mengelola buku, kategori, pengguna
 ```
 
 ## **3. Books**
-
----- Semua endpoint buku membutuhkan autentikasi. ----
 
 ### **3.1 Create Book**
 - **Endpoint:** POST `POST /api/books`
@@ -282,7 +281,4 @@ BookInventoryService adalah RESTful API untuk mengelola buku, kategori, pengguna
 {
   "message": "Book deleted successfully"
 }
-```
-
----- Authentication ----
-Authorization: Bearer <JWT_TOKEN_HERE>
+```  
