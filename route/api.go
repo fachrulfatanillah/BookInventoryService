@@ -30,5 +30,6 @@ func RegisterRoutes(r *gin.Engine) {
 		auth.GET("/books", controller.GetAllBooks)
 		auth.GET("/books/:id", controller.GetBookByID)
 		auth.PUT("/books/:id", controller.EditBook)
+		auth.DELETE("/books/:id", controller.DeleteBook)
 	}
 }
