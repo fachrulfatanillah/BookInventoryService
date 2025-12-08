@@ -199,3 +199,48 @@ func GetBooksByCategory(c *gin.Context) {
 		"data":    books,
 	})
 }
+
+func DeleteCategory(c *gin.Context) {
+	_, exists := c.Get("username")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized request",
+		})
+		return
+	}
+
+	idParam := c.Param("id")
+	categoryID, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid category ID",
+		})
+		return
+	}
+
+	var category model.Category
+	if err := database.DB.First(&category, categoryID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Category not found",
+		})
+		return
+	}
+
+	if err := database.DB.Where("category_id = ?", categoryID).Delete(&model.Book{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to delete books under this category",
+		})
+		return
+	}
+
+	if err := database.DB.Delete(&category).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to delete category",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Category and all books under it deleted successfully",
+	})
+}
