@@ -25,8 +25,9 @@ func RegisterRoutes(r *gin.Engine) {
 		auth.GET("/categories", controller.GetAllCategories)
 		auth.GET("/categories/:id", controller.GetCategoryByID)
 		auth.PUT("/categories/:id", controller.UpdateCategory)
-
+		
 		auth.POST("/books", controller.CreateBook)
 		auth.GET("/books", controller.GetAllBooks)
+		auth.GET("/books/:id", controller.GetBookByID)
 	}
 }
