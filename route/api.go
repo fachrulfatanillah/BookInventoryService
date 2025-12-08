@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"BookInventoryService/controller"
+	"BookInventoryService/middleware"
 
 )
 
@@ -17,4 +18,9 @@ func RegisterRoutes(r *gin.Engine) {
 
 	r.POST("api/users/register", controller.CreateUser)
 	r.POST("api/users/login", controller.Login)
+
+	auth := r.Group("/api", middleware.AuthMiddleware())
+	{
+		auth.POST("/category", controller.CreateCategory)
+	}
 }
