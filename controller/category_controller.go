@@ -158,3 +158,44 @@ func UpdateCategory(c *gin.Context) {
 		"data":    category,
 	})
 }
+
+func GetBooksByCategory(c *gin.Context) {
+	_, exists := c.Get("username")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized request",
+		})
+		return
+	}
+
+	idParam := c.Param("id")
+	categoryID, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid category ID",
+		})
+		return
+	}
+
+	var category model.Category
+	if err := database.DB.First(&category, categoryID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Category not found",
+		})
+		return
+	}
+
+	var books []model.Book
+	if err := database.DB.Where("category_id = ?", categoryID).Find(&books).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch books",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Books fetched successfully",
+		"category": category.Name,
+		"data":    books,
+	})
+}
