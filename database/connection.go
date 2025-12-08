@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -11,11 +12,15 @@ import (
 var DB *gorm.DB
 
 func ConnectDB() {
-	user := "root"
-	pass := "MySql@12345"
-	host := "localhost"
-	port := "3307"
-	name := "mini_project_books"
+	user := os.Getenv("MYSQLUSER")
+	pass := os.Getenv("MYSQLPASSWORD")
+	host := os.Getenv("MYSQLHOST")
+	port := os.Getenv("MYSQLPORT")
+	name := os.Getenv("MYSQLDATABASE")
+
+	if user == "" || pass == "" || host == "" || port == "" || name == "" {
+		log.Fatal("Database environment variables not set")
+	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		user,
