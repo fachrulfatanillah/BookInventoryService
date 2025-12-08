@@ -46,3 +46,27 @@ func CreateCategory(c *gin.Context) {
 		"data":    category,
 	})
 }
+
+func GetAllCategories(c *gin.Context) {
+	username, exists := c.Get("username")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized request",
+		})
+		return
+	}
+
+	var categories []model.Category
+
+	if err := database.DB.Find(&categories).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to retrieve categories",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":     "Categories fetched successfully",
+		"data":         categories,
+	})
+}

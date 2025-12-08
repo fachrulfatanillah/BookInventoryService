@@ -21,6 +21,7 @@ func RegisterRoutes(r *gin.Engine) {
 
 	auth := r.Group("/api", middleware.AuthMiddleware())
 	{
-		auth.POST("/category", controller.CreateCategory)
+		auth.POST("/categories", controller.CreateCategory)
+		auth.GET("/categories", controller.GetAllCategories)
 	}
 }
