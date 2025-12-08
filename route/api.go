@@ -24,5 +24,6 @@ func RegisterRoutes(r *gin.Engine) {
 		auth.POST("/categories", controller.CreateCategory)
 		auth.GET("/categories", controller.GetAllCategories)
 		auth.GET("/categories/:id", controller.GetCategoryByID)
+		auth.PUT("/categories/:id", controller.UpdateCategory)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 	"strconv"
+	"fmt"
 
 	"BookInventoryService/database"
 	"BookInventoryService/model"
@@ -103,5 +104,57 @@ func GetCategoryByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "Success",
 		"category": category,
+	})
+}
+
+func UpdateCategory(c *gin.Context) {
+	modifiedBy, exists := c.Get("username")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized request",
+		})
+		return
+	}
+
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid category ID",
+		})
+		return
+	}
+
+	var category model.Category
+	if err := database.DB.First(&category, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":   "Category not found",
+			"message": fmt.Sprintf("Category with ID %d does not exist", id),
+		})
+		return
+	}
+
+	name := c.PostForm("name")
+	if name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Category name is required",
+		})
+		return
+	}
+
+	category.Name = name
+	category.ModifiedAt = time.Now()
+	category.ModifiedBy = modifiedBy.(string)
+
+	if err := database.DB.Save(&category).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to update category",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Category updated successfully",
+		"data":    category,
 	})
 }
