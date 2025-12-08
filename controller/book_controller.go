@@ -106,3 +106,19 @@ func CreateBook(c *gin.Context) {
 		"data":    book,
 	})
 }
+
+func GetAllBooks(c *gin.Context) {
+	var books []model.Book
+
+	if err := database.DB.Find(&books).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch books",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Books retrieved successfully",
+		"data":    books,
+	})
+}
