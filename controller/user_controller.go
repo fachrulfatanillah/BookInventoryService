@@ -6,6 +6,8 @@ import (
 
 	"BookInventoryService/database"
 	"BookInventoryService/model"
+	"BookInventoryService/helper"
+
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -97,8 +99,17 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	token, err := helper.GenerateToken(user.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to generate token",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "Login successful",
+		"token":    token,
 		"username": user.Username,
 	})
 }
