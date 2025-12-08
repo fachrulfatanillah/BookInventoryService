@@ -14,12 +14,12 @@ Semua endpoint categories dan books membutuhkan **JWT token** di header:
 - **Body (form-data):**
   - `username` (string, required)
   - `password` (string, required)
+  - `created_by` (string, required)
 - **Response:**
 ```json
 {
     "message": "User registered successfully",
     "data": {
-        "id": 1,
         "username": "user1"
     }
 }
@@ -35,7 +35,8 @@ Semua endpoint categories dan books membutuhkan **JWT token** di header:
 ```json
 {
   "message": "Login successful",
-  "token": "JWT_TOKEN_HERE"
+  "token": "JWT_TOKEN_HERE",
+  "username": "user1"
 }
 ```
 
