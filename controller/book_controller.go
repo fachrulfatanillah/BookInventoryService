@@ -147,3 +147,118 @@ func GetBookByID(c *gin.Context) {
 		"data":    book,
 	})
 }
+
+func EditBook(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid book ID",
+		})
+		return
+	}
+
+	modifiedBy, exists := c.Get("username")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized request",
+		})
+		return
+	}
+
+	var book model.Book
+
+	if err := database.DB.First(&book, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Book not found",
+		})
+		return
+	}
+
+	title := c.PostForm("title")
+	description := c.PostForm("description")
+	imageURL := c.PostForm("image_url")
+	releaseYearStr := c.PostForm("release_year")
+	priceStr := c.PostForm("price")
+	totalPageStr := c.PostForm("total_page")
+	categoryIDStr := c.PostForm("category_id")
+
+	if title != "" {
+		book.Title = title
+	}
+	if description != "" {
+		book.Description = description
+	}
+	if imageURL != "" {
+		book.ImageURL = imageURL
+	}
+	if releaseYearStr != "" {
+		releaseYear, err := strconv.Atoi(releaseYearStr)
+		if err != nil || releaseYear < 1980 || releaseYear > 2024 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid release_year, must be between 1980 and 2024",
+			})
+			return
+		}
+		book.ReleaseYear = releaseYear
+	}
+	if priceStr != "" {
+		price, err := strconv.Atoi(priceStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid price format",
+			})
+			return
+		}
+		book.Price = price
+	}
+	if totalPageStr != "" {
+		totalPage, err := strconv.Atoi(totalPageStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid total_page format",
+			})
+			return
+		}
+		book.TotalPage = totalPage
+		
+		if totalPage > 100 {
+			book.Thickness = "tebal"
+		} else {
+			book.Thickness = "tipis"
+		}
+	}
+	if categoryIDStr != "" {
+		categoryID, err := strconv.Atoi(categoryIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid category_id format",
+			})
+			return
+		}
+		
+		var category model.Category
+		if err := database.DB.First(&category, categoryID).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid category_id — category not found",
+			})
+			return
+		}
+		book.CategoryID = uint(categoryID)
+	}
+
+	book.ModifiedAt = time.Now()
+	book.ModifiedBy = modifiedBy.(string)
+
+	if err := database.DB.Save(&book).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to update book",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Book updated successfully",
+		"data":    book,
+	})
+}
